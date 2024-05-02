@@ -3,16 +3,16 @@
 Zoom array function
 """
 
-from typing import List, Union
+from typing import List, Tuple
 
 
-def zoom_array(lst: List, factor: Union[int, float] = 2) -> List:
+def zoom_array(lst: Tuple, factor: int = 2) -> List:
     """
     Zoom in on the array by repeating each element by a given factor
     """
-    zoomed_in = [
+    zoomed_in: List = [
         item for item in lst
-        for _ in range(int(factor))
+        for i in range(int(factor))
     ]
     return zoomed_in
 
