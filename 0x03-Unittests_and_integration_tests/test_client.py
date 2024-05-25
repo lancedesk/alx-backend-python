@@ -63,7 +63,9 @@ class TestGithubOrgClient(unittest.TestCase):
 
     @patch('client.get_json')
     def test_public_repos(self, mocked_get_json):
-        '''Test public_repos method.'''
+        """
+        Test public_repos method.
+        """
         # Define the payload to be returned by get_json
         payload = [{"name": "Google"}, {"name": "TT"}]
         mocked_get_json.return_value = payload
@@ -82,6 +84,17 @@ class TestGithubOrgClient(unittest.TestCase):
             # Check if patched property & method were called once each
             mocked_public_repos_url.assert_called_once()
             mocked_get_json.assert_called_once()
+
+    @parameterized.expand([
+        ({"license": {"key": "my_license"}}, "my_license", True),
+        ({"license": {"key": "other_license"}}, "my_license", False)
+    ])
+    def test_has_license(self, repo, key, expectation):
+        """
+        Test has_license method.
+        """
+        result = GithubOrgClient.has_license(repo, key)
+        self.assertEqual(result, expectation)
 
 
 if __name__ == '__main__':
