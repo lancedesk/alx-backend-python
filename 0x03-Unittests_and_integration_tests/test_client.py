@@ -4,7 +4,7 @@ Unit tests for the GithubOrgClient class.
 """
 
 import unittest
-from unittest.mock import patch, MagicMock, PropertyMock
+from unittest.mock import patch, MagicMock, PropertyMock, call
 from parameterized import parameterized, parameterized_class
 from client import GithubOrgClient
 from typing import Dict
@@ -104,15 +104,74 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
     """
     Integration test
     """
-    @classmethod
-    def setUpClass(cls):
-        cls.get_patcher = patch('requests.get', side_effect=[
-            cls.org_payload, cls.repos_payload
-        ])
-        cls.mocked_get = cls.get_patcher.start()
 
     @classmethod
-    def tearDownClass(cls):
+    def setUpClass(cls):
+        cls.get_patcher = patch('client.get_json')
+        cls.mocked_get = cls.get_patcher.start()
+
+    def test_public_repos(self) -> None:
+        """
+        Test the public_repos method of the GithubOrgClient class.
+        
+        Verifies that the public_repos method returns the expected list
+        of repositories associated with a GitHub organization.
+        
+        Returns:
+            None
+        """
+        google_client = GithubOrgClient('Google')
+
+        url = "https://api.github.com/orgs/Google"
+        self.mocked_get.side_effect = [self.org_payload, self.repos_payload]
+
+        self.assertEqual(google_client.org, self.org_payload)
+        self.assertEqual(google_client.repos_payload, self.repos_payload)
+        self.assertEqual(google_client.public_repos(), self.expected_repos)
+        self.assertEqual(google_client.public_repos("NONEXISTENT"), [])
+        self.mocked_get.assert_has_calls([
+            call(url),
+            call(self.org_payload["repos_url"])
+        ])
+
+    def test_public_repos_with_license(self) -> None:
+        """
+        Test public_repos method of the GithubOrgClient class
+        with a specified license.
+        
+        Verifies that the public_repos method returns the expected list
+        of repositories associated with a GitHub organization
+        that have a specific license.
+        
+        Returns:
+            None
+        """
+        google_client = GithubOrgClient('Google')
+
+        url = "https://api.github.com/orgs/Google"
+        self.mocked_get.side_effect = [self.org_payload, self.repos_payload]
+
+        self.assertEqual(google_client.org, self.org_payload)
+        self.assertEqual(google_client.repos_payload, self.repos_payload)
+        self.assertEqual(google_client.public_repos(), self.expected_repos)
+        self.assertEqual(google_client.public_repos("NONEXISTENT"), [])
+        self.assertEqual(google_client.public_repos("apache-2.0"), self.apache2_repos)
+        self.mocked_get.assert_has_calls([
+            call(url),
+            call(self.org_payload["repos_url"])
+        ])
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        """
+        Clean up after the integration tests.
+        
+        Stops the patcher used to mock requests.get
+        during the integration tests.
+        
+        Returns:
+            None
+        """
         cls.get_patcher.stop()
 
 
