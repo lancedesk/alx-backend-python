@@ -113,10 +113,10 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
     def test_public_repos(self) -> None:
         """
         Test the public_repos method of the GithubOrgClient class.
-        
+
         Verifies that the public_repos method returns the expected list
         of repositories associated with a GitHub organization.
-        
+
         Returns:
             None
         """
@@ -138,11 +138,11 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         """
         Test public_repos method of the GithubOrgClient class
         with a specified license.
-        
+
         Verifies that the public_repos method returns the expected list
         of repositories associated with a GitHub organization
         that have a specific license.
-        
+
         Returns:
             None
         """
@@ -155,7 +155,8 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
         self.assertEqual(google_client.repos_payload, self.repos_payload)
         self.assertEqual(google_client.public_repos(), self.expected_repos)
         self.assertEqual(google_client.public_repos("NONEXISTENT"), [])
-        self.assertEqual(google_client.public_repos("apache-2.0"), self.apache2_repos)
+        self.assertEqual(google_client.public_repos("apache-2.0"),
+                         self.apache2_repos)
         self.mocked_get.assert_has_calls([
             call(url),
             call(self.org_payload["repos_url"])
@@ -165,10 +166,10 @@ class TestIntegrationGithubOrgClient(unittest.TestCase):
     def tearDownClass(cls) -> None:
         """
         Clean up after the integration tests.
-        
+
         Stops the patcher used to mock requests.get
         during the integration tests.
-        
+
         Returns:
             None
         """
